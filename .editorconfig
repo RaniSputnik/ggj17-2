@@ -1,0 +1,10 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Always use tabs, always use unix line endings
+[*]
+end_of_line = lf
+insert_final_newline = true
+indent_style = tab
