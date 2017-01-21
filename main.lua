@@ -1,7 +1,9 @@
 color = require("color")
+physics = require("physics")
 
 DEBUG_DRAW_WATER_POLY = true
 DEBUG_DRAW_NO_BG = true
+DEBUG_DRAW_PHYSICS = true
 
 KEY_RESTART = "r"
 KEY_QUIT = "escape"
@@ -32,6 +34,20 @@ function love.load()
 		}
 	end
 
+	physics.newWorld()
+
+	local p1 = physics.newPoint(100,100)
+	local p2 = physics.newPoint(160,80)
+	local p3 = physics.newPoint(180,180)
+	local p4 = physics.newPoint(100,150)
+
+	physics.newConstraint(p1,p2)
+	physics.newConstraint(p2,p3)
+	physics.newConstraint(p3,p4)
+	physics.newConstraint(p4,p1)
+
+	physics.newConstraint(p1,p3)
+	physics.newConstraint(p2,p4)
 end
 
 function love.update(dt)
@@ -50,6 +66,8 @@ function love.update(dt)
 		pt.dist = math.sin(pt.x * 0.01) * 100
 		table.insert(wave_points, pt)
 	end
+
+	physics.run(dt)
 end
 
 function love.draw()
@@ -72,6 +90,11 @@ function love.draw()
 			local pt2 = wave_points[i+1]
 			love.graphics.polygon(water_mode, pt.x+wx,pt.y,pt2.x+wx,pt2.y,pt2.x+wx,gh,pt.x+wx,gh)
 		end
+	end
+
+	if DEBUG_DRAW_PHYSICS then
+		love.graphics.setColor(0,255,0)
+		physics.debugDraw()
 	end
 end
 
