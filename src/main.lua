@@ -18,15 +18,19 @@ KEY_LEFT = "left"
 COL_WHITE = color.rgb(255,255,255)
 COL_WATER = color.rgb(41,63,101)
 
-REST_Y = love.graphics.getHeight()*0.7
+REST_Y = love.graphics.getHeight()*0.6
 NUMBER_OF_WAVE_POINTS = 100
 STARTING_WAVE_SIZE = 50
-WATER_SPEED = 10
-WIND_SPEED = 1
+WAVE_GROWTH_RATE = 2.2
+RIPPLE_GROWTH_RATE = 2.6
+RIPPLE_FREQUENCY = 0.014
+WATER_SPEED = 28
+WAVE_FREQUENCY = 0.01
+WIND_SPEED = 1.4
 DIST_BETWEEN_WATER_POINTS = love.graphics.getWidth() / NUMBER_OF_WAVE_POINTS * 2
 DEPTH_TO_LOSE = 55
 ANGLE_TO_LOSE = math.rad(90)
-INPUT_XSTRENGTH = 50
+INPUT_XSTRENGTH = 0
 INPUT_YSTRENGTH = 100
 
 BAL_REMEMBER = 1
@@ -51,11 +55,11 @@ function love.load()
 			i = i,
 			x = xx,
 			y = yy,
-			dist = math.sin(xx * 0.01) * STARTING_WAVE_SIZE
+			dist = math.sin(xx * WAVE_FREQUENCY) * STARTING_WAVE_SIZE
 		}
 	end
 
-	createBoat(150,500)
+	createBoat(150,440)
 
 	if lost then
 		love.audio.stop(assets.music.remember)
@@ -82,7 +86,7 @@ function love.update(dt)
 	local sp = dt * 90
 	wave_offset = wave_offset - sp
 	for i,pt in ipairs(wave_points) do
-		pt.y = REST_Y + pt.dist + math.sin((pt.x + wave_offset) * 0.02) * total_time
+		pt.y = REST_Y + pt.dist + math.sin((pt.x + wave_offset*.5) * RIPPLE_FREQUENCY) * total_time * RIPPLE_GROWTH_RATE
 	end
 
 	if wave_offset < -wave_points[1].x - DIST_BETWEEN_WATER_POINTS then
@@ -91,7 +95,7 @@ function love.update(dt)
 		local lastpt = wave_points[n]
 		pt.i = lastpt.i + 1
 		pt.x = (pt.i-1) * DIST_BETWEEN_WATER_POINTS
-		pt.dist = math.sin(pt.x * 0.01) * (STARTING_WAVE_SIZE + total_time)
+		pt.dist = math.sin(pt.x * WAVE_FREQUENCY) * (STARTING_WAVE_SIZE + total_time * WAVE_GROWTH_RATE)
 		table.insert(wave_points, pt)
 	end
 
