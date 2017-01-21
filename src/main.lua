@@ -17,6 +17,7 @@ KEY_LEFT = "left"
 
 COL_WHITE = color.rgb(255,255,255)
 COL_WATER = color.rgb(41,63,101)
+COL_WATER_OUTLINE = color.rgb(28,42,70)
 
 REST_Y = love.graphics.getHeight()*0.6
 NUMBER_OF_WAVE_POINTS = 100
@@ -194,6 +195,7 @@ function love.draw()
     end
     -- Remove stencil restriction
     love.graphics.setStencilTest()
+    drawWaterOutline()
 
 	if DEBUG_DRAW_PHYSICS then
 		love.graphics.setColor(0,255,0)
@@ -263,6 +265,18 @@ function drawWater()
 		if i < n then
 			local pt2 = wave_points[i+1]
 			love.graphics.polygon(water_mode, pt.x+wx,pt.y,pt2.x+wx,pt2.y,pt2.x+wx,gh,pt.x+wx,gh)
+		end
+	end
+end
+
+function drawWaterOutline()
+	local wx = wave_offset
+	local n = table.getn(wave_points)
+	love.graphics.setColor(color.val(COL_WATER_OUTLINE))
+	for i,pt in ipairs(wave_points) do
+		if i < n then
+			local pt2 = wave_points[i+1]
+			love.graphics.line(pt.x+wx,pt.y,pt2.x+wx,pt2.y)
 		end
 	end
 end
