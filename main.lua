@@ -1,8 +1,9 @@
 color = require("color")
 physics = require("physics")
+geom = require("geom")
 
-DEBUG_DRAW_WATER_POLY = true
-DEBUG_DRAW_NO_BG = true
+DEBUG_DRAW_WATER_POLY = false
+DEBUG_DRAW_NO_BG = false
 DEBUG_DRAW_PHYSICS = true
 DEBUG_DRAW_WATER_HEIGHT = false
 
@@ -39,15 +40,19 @@ function love.load()
 
 	-- p7-p1-p2-p5-p8
 	--    p4-p3-p6
-	local p1 = physics.newPoint(100,500)
-	local p2 = physics.newPoint(150,500)
+	local p1 = physics.newPoint(130,540)
+	local p2 = physics.newPoint(150,540)
 	local p3 = physics.newPoint(150,550)
-	local p4 = physics.newPoint(100,520)
-	local p5 = physics.newPoint(200,500)
-	local p6 = physics.newPoint(200,520)
+	local p4 = physics.newPoint(130,545)
+	local p5 = physics.newPoint(170,540)
+	local p6 = physics.newPoint(170,545)
 
-	local p7 = physics.newPoint(50,500)
-	local p8 = physics.newPoint(250,500)
+	local p7 = physics.newPoint(100,500)
+	local p8 = physics.newPoint(200,500)
+
+	boat_center = p3
+	boat_left = p1
+	boat_right = p5
 
 	physics.newConstraint(p1,p2)
 	physics.newConstraint(p2,p3)
@@ -68,6 +73,8 @@ function love.load()
 	physics.newConstraint(p7,p4)
 	physics.newConstraint(p8,p5)
 	physics.newConstraint(p8,p6)
+
+	physics.newConstraint(p7,p8)
 end
 
 function love.update(dt)
@@ -101,9 +108,10 @@ function love.update(dt)
 end
 
 function love.draw()
+	local img = assets.img.bg_storm
+	local sx, sy = love.graphics.getDimensions() / img:getDimensions()
+
 	if not DEBUG_DRAW_NO_BG then
-		local img = assets.img.bg_storm
-		local sx, sy = love.graphics.getDimensions() / img:getDimensions()
 		love.graphics.setColor(color.val(COL_WHITE))
 		love.graphics.draw(img, 0,0, 0, sx,sy)
 	end
@@ -126,6 +134,11 @@ function love.draw()
 		love.graphics.setColor(0,255,0)
 		physics.debugDraw()
 	end
+	local r = geom.angleBetween(boat_left.x,boat_left.y, boat_right.x,boat_right.y)
+	local ox = assets.img.boat:getWidth() * 0.5
+	local oy = assets.img.boat:getHeight() * 0.5
+	love.graphics.setColor(color.val(COL_WHITE))
+	love.graphics.draw(assets.img.boat, boat_center.x,boat_center.y, r, sx,sy, ox,oy)
 
 	if DEBUG_DRAW_WATER_HEIGHT then
 		local mx = love.mouse.getX()
