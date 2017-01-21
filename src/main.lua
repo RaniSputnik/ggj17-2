@@ -25,7 +25,7 @@ STARTING_WAVE_SIZE = 50
 WAVE_GROWTH_RATE = 2.2
 RIPPLE_GROWTH_RATE = 2.6
 RIPPLE_FREQUENCY = 0.014
-WATER_SPEED = 28
+WATER_SPEED = 15
 WAVE_FREQUENCY = 0.01
 WIND_SPEED = 1.4
 DIST_BETWEEN_WATER_POINTS = love.graphics.getWidth() / NUMBER_OF_WAVE_POINTS * 2
@@ -117,6 +117,7 @@ function love.update(dt)
 	end
 
 	-- Physics the boat
+	local wind_if_behind_x = love.graphics.getWidth()*.5
 	local on_the_screen = false
 	for i,p in ipairs(physics.points) do
 		if p.x > 0 then on_the_screen = true end
@@ -145,7 +146,7 @@ function love.update(dt)
 			end
 		elseif p.underwater then
 			p.y = p.y + (water_level - p.y) * .1
-		elseif p ~= boat_top then
+		elseif p ~= boat_top and p.x < wind_if_behind_x then
 			p.ax = p.ax + WIND_SPEED
 		end
 	end
