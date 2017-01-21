@@ -130,7 +130,7 @@ function love.update(dt)
 			end
 			if p == boat_top then
 				local a = getBoatAngle()
-				if p.y - water_level > DEPTH_TO_LOSE and a > math.pi - ANGLE_TO_LOSE and a < math.pi + ANGLE_TO_LOSE then
+				if not lost and p.y - water_level > DEPTH_TO_LOSE and a > math.pi - ANGLE_TO_LOSE and a < math.pi + ANGLE_TO_LOSE then
 					loseBecausePlayerHasCapsized()
 				end
 			else
