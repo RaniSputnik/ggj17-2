@@ -135,7 +135,10 @@ function love.update(dt)
 	end
 
 	-- Physics the boat
+	local on_the_screen = false
 	for i,p in ipairs(physics.points) do
+		if p.x > 0 then on_the_screen = true end
+
 		local water_level = waterHeightAtX(p.x)
 		if p.y > water_level then
 			if p == boat_top then
@@ -157,6 +160,7 @@ function love.update(dt)
 	-- Run the verlet and constraints
 	physics.run(dt)
 
+	if not on_the_screen then lost = true end
 
 	-- fade the music
 	if lost then
