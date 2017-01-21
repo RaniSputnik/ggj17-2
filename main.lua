@@ -16,6 +16,8 @@ COL_WATER = color.rgb(41,63,101)
 REST_Y = love.graphics.getHeight()*0.7
 NUMBER_OF_WAVE_POINTS = 100
 DIST_BETWEEN_WATER_POINTS = love.graphics.getWidth() / NUMBER_OF_WAVE_POINTS * 2
+DEPTH_TO_LOSE = 20
+ANGLE_TO_LOSE = math.rad(20)
 
 function love.load()
 	if assets == nil then
@@ -51,9 +53,11 @@ function love.load()
 	local p7 = physics.newPoint(150,500)
 	p7.float = false
 
+	boat_img = assets.img.sailboat
 	boat_center = p3
 	boat_left = p1
 	boat_right = p5
+	boat_top = p7
 
 	physics.newConstraint(p1,p2)
 	physics.newConstraint(p2,p3)
@@ -73,6 +77,8 @@ function love.load()
 	physics.newConstraint(p2,p7)
 	physics.newConstraint(p1,p7)
 	physics.newConstraint(p5,p7)
+
+	lost = false
 end
 
 function love.update(dt)
@@ -97,10 +103,18 @@ function love.update(dt)
 	-- Physics the boat
 	for i,p in ipairs(physics.points) do
 		local water_level = waterHeightAtX(p.x)
-		if p.float and p.y > water_level then
-			local f = math.max(-physics.gravity*1.5, water_level-p.y)
-			p.oldx = p.x
-			p.y = p.y - (p.y - water_level)*0.01
+		if p.y > water_level then
+			if p == boat_top then
+				local a = getBoatAngle()
+				if p.y - water_level > DEPTH_TO_LOSE and a > math.pi - ANGLE_TO_LOSE and a < math.pi + ANGLE_TO_LOSE then
+					lost = true
+					boat_img = assets.img.sailboat_sunk
+				end
+			else
+				local f = math.max(-physics.gravity*1.5, water_level-p.y)
+				p.oldx = p.x
+				p.y = p.y - (p.y - water_level)*0.01
+			end
 		end
 	end
 	-- Run the verlet and constraints
@@ -134,11 +148,12 @@ function love.draw()
 		love.graphics.setColor(0,255,0)
 		physics.debugDraw()
 	end
-	local r = geom.angleBetween(boat_left.x,boat_left.y, boat_right.x,boat_right.y)
-	local ox = assets.img.boat:getWidth() * 0.5
-	local oy = assets.img.boat:getHeight() * 0.7
+	local r = getBoatAngle()
+	local ox = boat_img:getWidth() * 0.5
+	local oy = boat_img:getHeight()
 	love.graphics.setColor(color.val(COL_WHITE))
-	love.graphics.draw(assets.img.boat, boat_center.x,boat_center.y, r, sx,sy, ox,oy)
+	love.graphics.draw(boat_img, boat_center.x,boat_center.y, r, sx,sy, ox,oy)
+	print(math.deg(r))
 
 	if DEBUG_DRAW_WATER_HEIGHT then
 		local mx = love.mouse.getX()
@@ -169,4 +184,8 @@ function waterHeightAtX(x)
 			return pt.y + dy * a
 		end
 	end
+end
+
+function getBoatAngle()
+	return geom.angleBetween(boat_left.x,boat_left.y, boat_right.x,boat_right.y)
 end
