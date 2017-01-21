@@ -6,18 +6,26 @@ function love.load()
 	local xinc = love.graphics.getWidth() / number_of_wave_points * 2
 	for i=1,number_of_wave_points do
 		local xx = (i-1)*xinc
-		local yy = love.graphics.getHeight()*0.5 - math.sin(xx * 0.01) * 50
+		local yy = love.graphics.getHeight()*0.5
+		print(xx)
 
 		wave_points[i] = {
 			x = xx,
-			y = yy
+			y = yy,
+			dist = math.sin(xx * 0.01) * 100
 		}
 	end
 
 end
 
 function love.update(dt)
+	local sp = dt * 90
+	local rest = love.graphics.getHeight()*0.5
 
+	for i,pt in ipairs(wave_points) do
+		pt.x = pt.x - sp
+		pt.y = rest + pt.dist + math.sin(pt.x * 0.02) * 10
+	end
 end
 
 function love.draw()
