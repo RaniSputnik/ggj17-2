@@ -4,7 +4,8 @@ return {
 		boat = love.graphics.newImage("assets/boat.png"),
 		sailboat = love.graphics.newImage("assets/sailboat.png"),
 		sailboat_sunk = love.graphics.newImage("assets/sailboat-sunk.png"),
-		cloud1 = love.graphics.newImage("assets/cloud-1.png")
+		cloud1 = love.graphics.newImage("assets/cloud-1.png"),
+		water = love.graphics.newImage("assets/water2.png")
 	},
 	fx = {},
 	music = {

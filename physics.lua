@@ -20,7 +20,8 @@ physics.newPoint = function(x,y)
 		oldx = x, 
 		oldy = y,
 		ax = 0, 
-		ay = 0
+		ay = 0,
+		underwater = false
 	}
 	table.insert(physics.points, p)
 	return p

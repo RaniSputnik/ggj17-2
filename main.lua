@@ -22,7 +22,7 @@ NUMBER_OF_WAVE_POINTS = 100
 WATER_SPEED = 30
 WIND_SPEED = 1
 DIST_BETWEEN_WATER_POINTS = love.graphics.getWidth() / NUMBER_OF_WAVE_POINTS * 2
-DEPTH_TO_LOSE = 30
+DEPTH_TO_LOSE = 35
 ANGLE_TO_LOSE = math.rad(90)
 INPUT_XSTRENGTH = 50
 INPUT_YSTRENGTH = 100
@@ -146,6 +146,12 @@ function love.update(dt)
 
 		local water_level = waterHeightAtX(p.x)
 		if p.y > water_level then
+			-- If we've lost, mark underwater particles as 'underwater'
+			-- this will ensure they never leave the water. You shouldn't
+			-- be able to bounce around after you've already lost the game
+			if lost then 
+				p.underwater = true
+			end
 			if p == boat_top then
 				local a = getBoatAngle()
 				if p.y - water_level > DEPTH_TO_LOSE and a > math.pi - ANGLE_TO_LOSE and a < math.pi + ANGLE_TO_LOSE then
@@ -158,10 +164,14 @@ function love.update(dt)
 				p.ax = p.ax - WATER_SPEED
 				p.y = p.y - (p.y - water_level)*0.01
 			end
+		elseif p.underwater then
+			p.y = p.y + (water_level - p.y) * .1
 		elseif p ~= boat_top then
 			p.ax = p.ax + WIND_SPEED
 		end
 	end
+	-- Pull down the top of the boat if we've lost
+	if lost and boat_top.underwater then boat_top.ay = boat_top.ay + 5 end
 	-- Run the verlet and constraints
 	physics.run(dt)
 
@@ -179,27 +189,31 @@ end
 
 function love.draw()
 	local img = assets.img.bg_storm
-	local sx, sy = love.graphics.getDimensions() / img:getDimensions()
-
+	local sx, sy = love.graphics.getDimensions()
+	local ix, iy = img:getDimensions()
+	sx = sx / ix
+	sy = sy / iy
 	if not DEBUG_DRAW_NO_BG then
 		love.graphics.setColor(color.val(COL_WHITE))
 		love.graphics.draw(img, 0,0, 0, sx,sy)
 	end
 	clouds.draw(CLOUD_CENTER_X,CLOUD_CENTER_Y, sx,sy, DEBUG_DRAW_CLOUDS)
-
-	local vertices = {}
-	local n = table.getn(wave_points)
-	local gh = love.graphics.getHeight()
-	local wx = wave_offset
-	local water_mode = "fill"
-	if DEBUG_DRAW_WATER_POLY then water_mode = "line" end
-	love.graphics.setColor(color.val(COL_WATER))
-	for i,pt in ipairs(wave_points) do
-		if i < n then
-			local pt2 = wave_points[i+1]
-			love.graphics.polygon(water_mode, pt.x+wx,pt.y,pt2.x+wx,pt2.y,pt2.x+wx,gh,pt.x+wx,gh)
-		end
-	end
+	
+	-- draw a rectangle as a stencil. Each pixel touched by the rectangle will have its stencil value set to 1. The rest will be 0.
+    love.graphics.stencil(drawWater, "replace", 1)
+   	-- Only allow rendering on pixels which have a stencil value greater than 0.
+    love.graphics.setStencilTest("greater", 0)
+    local watertex = assets.img.water
+    local texw = watertex:getWidth() * sx
+    local texh = watertex:getHeight() * sy
+    love.graphics.setColor(255,255,255)
+    for xx = (wave_offset*0.5)%texw - texw, love.graphics.getWidth(), texw do
+    	for yy = math.sin(wave_offset * 0.01) * 20, love.graphics.getHeight(), texh do
+    		love.graphics.draw(watertex, xx,yy, 0, sx,sy)
+    	end
+    end
+    -- Remove stencil restriction
+    love.graphics.setStencilTest()
 
 	if DEBUG_DRAW_PHYSICS then
 		love.graphics.setColor(0,255,0)
@@ -224,6 +238,22 @@ function love.keypressed(key)
 		love.load()
 	elseif key == KEY_QUIT then
 		love.event.quit()
+	end
+end
+
+function drawWater()
+	local vertices = {}
+	local n = table.getn(wave_points)
+	local gh = love.graphics.getHeight()
+	local wx = wave_offset
+	local water_mode = "fill"
+	if DEBUG_DRAW_WATER_POLY then water_mode = "line" end
+	love.graphics.setColor(color.val(COL_WATER))
+	for i,pt in ipairs(wave_points) do
+		if i < n then
+			local pt2 = wave_points[i+1]
+			love.graphics.polygon(water_mode, pt.x+wx,pt.y,pt2.x+wx,pt2.y,pt2.x+wx,gh,pt.x+wx,gh)
+		end
 	end
 end
 
