@@ -2,6 +2,7 @@ color = require("color")
 physics = require("physics")
 geom = require("geom")
 clouds = require("clouds")
+msg = require("message")
 
 DEBUG_DRAW_WATER_POLY = false
 DEBUG_DRAW_NO_BG = false
@@ -19,7 +20,8 @@ COL_WATER = color.rgb(41,63,101)
 
 REST_Y = love.graphics.getHeight()*0.7
 NUMBER_OF_WAVE_POINTS = 100
-WATER_SPEED = 30
+STARTING_WAVE_SIZE = 50
+WATER_SPEED = 10
 WIND_SPEED = 1
 DIST_BETWEEN_WATER_POINTS = love.graphics.getWidth() / NUMBER_OF_WAVE_POINTS * 2
 DEPTH_TO_LOSE = 35
@@ -49,7 +51,7 @@ function love.load()
 			i = i,
 			x = xx,
 			y = yy,
-			dist = math.sin(xx * 0.01) * 100
+			dist = math.sin(xx * 0.01) * STARTING_WAVE_SIZE
 		}
 	end
 
@@ -64,7 +66,7 @@ function love.load()
 	local p4 = physics.newPoint(130,545)
 	local p5 = physics.newPoint(170,540)
 	local p6 = physics.newPoint(170,545)
-	local p7 = physics.newPoint(150,500)
+	local p7 = physics.newPoint(150,480)
 	p7.float = false
 
 	boat_img = assets.img.sailboat
@@ -101,6 +103,8 @@ function love.load()
 	assets.music.stormatsea:setVolume(BAL_STORM_AT_SEA)
 
 	lost = false
+	msg.hide()
+	fade_in = 255
 end
 
 function love.update(dt)
@@ -121,7 +125,7 @@ function love.update(dt)
 		local lastpt = wave_points[n]
 		pt.i = lastpt.i + 1
 		pt.x = (pt.i-1) * DIST_BETWEEN_WATER_POINTS
-		pt.dist = math.sin(pt.x * 0.01) * (100 + total_time)
+		pt.dist = math.sin(pt.x * 0.01) * (STARTING_WAVE_SIZE + total_time)
 		table.insert(wave_points, pt)
 	end
 
@@ -155,8 +159,7 @@ function love.update(dt)
 			if p == boat_top then
 				local a = getBoatAngle()
 				if p.y - water_level > DEPTH_TO_LOSE and a > math.pi - ANGLE_TO_LOSE and a < math.pi + ANGLE_TO_LOSE then
-					lost = true
-					boat_img = assets.img.sailboat_sunk
+					loseBecausePlayerHasCapsized()
 				end
 			else
 				local f = math.max(-physics.gravity*1.5, water_level-p.y)
@@ -175,7 +178,9 @@ function love.update(dt)
 	-- Run the verlet and constraints
 	physics.run(dt)
 
-	if not on_the_screen then lost = true end
+	if not lost and not on_the_screen then 
+		loseBecausePlayerIsOffTheScreen()
+	end
 
 	-- fade the music
 	if lost then
@@ -231,6 +236,14 @@ function love.draw()
 		love.graphics.setColor(0, 255, 255)
 		love.graphics.circle("fill", mx, hy, 2, 5)
 	end
+
+	msg.draw()
+
+	fade_in = fade_in - 2
+	if fade_in > 0 then
+		love.graphics.setColor(0, 0, 0, fade_in)
+		love.graphics.rectangle("fill",0,0,love.graphics.getWidth(),love.graphics.getHeight())
+	end
 end
 
 function love.keypressed(key)
@@ -239,6 +252,17 @@ function love.keypressed(key)
 	elseif key == KEY_QUIT then
 		love.event.quit()
 	end
+end
+
+function loseBecausePlayerIsOffTheScreen()
+	lost = true
+	msg.show("Lost at sea")
+end
+
+function loseBecausePlayerHasCapsized()
+	lost = true
+	boat_img = assets.img.sailboat_sunk
+	msg.show("Drowned in the storm")
 end
 
 function drawWater()
