@@ -17,10 +17,13 @@ COL_WATER = color.rgb(41,63,101)
 
 REST_Y = love.graphics.getHeight()*0.7
 NUMBER_OF_WAVE_POINTS = 100
+WATER_SPEED = 30
+WIND_SPEED = 1
 DIST_BETWEEN_WATER_POINTS = love.graphics.getWidth() / NUMBER_OF_WAVE_POINTS * 2
 DEPTH_TO_LOSE = 30
 ANGLE_TO_LOSE = math.rad(90)
-INPUT_STRENGTH = 100
+INPUT_XSTRENGTH = 50
+INPUT_YSTRENGTH = 100
 
 BAL_REMEMBER = 1
 BAL_STORM_AT_SEA = .1
@@ -124,9 +127,10 @@ function love.update(dt)
 		if love.keyboard.isDown(KEY_LEFT) then input = input - 1 end
 
 		if input == 1 then
-			boat_right.ay = boat_right.ay + INPUT_STRENGTH
+			boat_right.ay = boat_right.ay + INPUT_YSTRENGTH
 		elseif input == -1 then
-			boat_left.ay = boat_left.ay + INPUT_STRENGTH
+			boat_left.ax = boat_left.ax - INPUT_XSTRENGTH
+			boat_left.ay = boat_left.ay + INPUT_YSTRENGTH
 		end
 	end
 
@@ -143,8 +147,11 @@ function love.update(dt)
 			else
 				local f = math.max(-physics.gravity*1.5, water_level-p.y)
 				p.oldx = p.x
+				p.ax = p.ax - WATER_SPEED
 				p.y = p.y - (p.y - water_level)*0.01
 			end
+		elseif p ~= boat_top then
+			p.ax = p.ax + WIND_SPEED
 		end
 	end
 	-- Run the verlet and constraints
