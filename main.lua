@@ -9,6 +9,8 @@ DEBUG_DRAW_WATER_HEIGHT = false
 
 KEY_RESTART = "r"
 KEY_QUIT = "escape"
+KEY_RIGHT = "right"
+KEY_LEFT = "left"
 
 COL_WHITE = color.rgb(255,255,255)
 COL_WATER = color.rgb(41,63,101)
@@ -18,6 +20,7 @@ NUMBER_OF_WAVE_POINTS = 100
 DIST_BETWEEN_WATER_POINTS = love.graphics.getWidth() / NUMBER_OF_WAVE_POINTS * 2
 DEPTH_TO_LOSE = 20
 ANGLE_TO_LOSE = math.rad(20)
+INPUT_STRENGTH = 100
 
 function love.load()
 	if assets == nil then
@@ -82,7 +85,10 @@ function love.load()
 end
 
 function love.update(dt)
-	total_time = total_time + dt
+	-- The seas only get rougher if we haven't lost yet
+	if not lost then
+		total_time = total_time + dt
+	end
 
 	local sp = dt * 90
 	wave_offset = wave_offset - sp
@@ -98,6 +104,19 @@ function love.update(dt)
 		pt.x = (pt.i-1) * DIST_BETWEEN_WATER_POINTS
 		pt.dist = math.sin(pt.x * 0.01) * (100 + total_time)
 		table.insert(wave_points, pt)
+	end
+
+	-- Gather player input
+	if not lost then
+		local input = 0
+		if love.keyboard.isDown(KEY_RIGHT) then input = input + 1 end
+		if love.keyboard.isDown(KEY_LEFT) then input = input - 1 end
+
+		if input == 1 then
+			boat_right.ay = boat_right.ay + INPUT_STRENGTH
+		elseif input == -1 then
+			boat_left.ay = boat_left.ay + INPUT_STRENGTH
+		end
 	end
 
 	-- Physics the boat
@@ -153,7 +172,6 @@ function love.draw()
 	local oy = boat_img:getHeight()
 	love.graphics.setColor(color.val(COL_WHITE))
 	love.graphics.draw(boat_img, boat_center.x,boat_center.y, r, sx,sy, ox,oy)
-	print(math.deg(r))
 
 	if DEBUG_DRAW_WATER_HEIGHT then
 		local mx = love.mouse.getX()
