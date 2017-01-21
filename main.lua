@@ -55,44 +55,7 @@ function love.load()
 		}
 	end
 
-	physics.newWorld()
-
-	--    p7
-	-- p1-p2-p5
-	-- p4-p3-p6
-	local p1 = physics.newPoint(130,540)
-	local p2 = physics.newPoint(150,540)
-	local p3 = physics.newPoint(150,550)
-	local p4 = physics.newPoint(130,545)
-	local p5 = physics.newPoint(170,540)
-	local p6 = physics.newPoint(170,545)
-	local p7 = physics.newPoint(150,480)
-	p7.float = false
-
-	boat_img = assets.img.sailboat
-	boat_center = p3
-	boat_left = p1
-	boat_right = p5
-	boat_top = p7
-
-	physics.newConstraint(p1,p2)
-	physics.newConstraint(p2,p3)
-	physics.newConstraint(p3,p4)
-	physics.newConstraint(p4,p1)
-
-	physics.newConstraint(p1,p3)
-	physics.newConstraint(p2,p4)
-
-	physics.newConstraint(p2,p5)
-	physics.newConstraint(p5,p6)
-	physics.newConstraint(p6,p3)
-
-	physics.newConstraint(p2,p6)
-	physics.newConstraint(p3,p5)
-
-	physics.newConstraint(p2,p7)
-	physics.newConstraint(p1,p7)
-	physics.newConstraint(p5,p7)
+	createBoat(150,500)
 
 	if lost then
 		love.audio.stop(assets.music.remember)
@@ -294,6 +257,47 @@ function waterHeightAtX(x)
 			return pt.y + dy * a
 		end
 	end
+end
+
+function createBoat(x,y)
+	physics.newWorld()
+
+	--    p7
+	-- p1-p2-p5
+	-- p4-p3-p6
+	local p1 = physics.newPoint(x-20,y)
+	local p2 = physics.newPoint(x,y)
+	local p3 = physics.newPoint(x,y+10)
+	local p4 = physics.newPoint(x-20,y+5)
+	local p5 = physics.newPoint(x+20,y)
+	local p6 = physics.newPoint(x+20,y+5)
+	local p7 = physics.newPoint(x,y-60)
+	p7.float = false
+
+	boat_img = assets.img.sailboat
+	boat_center = p3
+	boat_left = p1
+	boat_right = p5
+	boat_top = p7
+
+	physics.newConstraint(p1,p2)
+	physics.newConstraint(p2,p3)
+	physics.newConstraint(p3,p4)
+	physics.newConstraint(p4,p1)
+
+	physics.newConstraint(p1,p3)
+	physics.newConstraint(p2,p4)
+
+	physics.newConstraint(p2,p5)
+	physics.newConstraint(p5,p6)
+	physics.newConstraint(p6,p3)
+
+	physics.newConstraint(p2,p6)
+	physics.newConstraint(p3,p5)
+
+	physics.newConstraint(p2,p7)
+	physics.newConstraint(p1,p7)
+	physics.newConstraint(p5,p7)
 end
 
 function getBoatAngle()
