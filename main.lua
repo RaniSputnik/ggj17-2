@@ -18,8 +18,8 @@ COL_WATER = color.rgb(41,63,101)
 REST_Y = love.graphics.getHeight()*0.7
 NUMBER_OF_WAVE_POINTS = 100
 DIST_BETWEEN_WATER_POINTS = love.graphics.getWidth() / NUMBER_OF_WAVE_POINTS * 2
-DEPTH_TO_LOSE = 20
-ANGLE_TO_LOSE = math.rad(20)
+DEPTH_TO_LOSE = 30
+ANGLE_TO_LOSE = math.rad(90)
 INPUT_STRENGTH = 100
 
 function love.load()
