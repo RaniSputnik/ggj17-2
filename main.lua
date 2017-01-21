@@ -6,6 +6,8 @@ KEY_QUIT = "escape"
 COL_WHITE = color.rgb(255,255,255)
 COL_WATER = color.rgb(41,63,101)
 
+REST_Y = love.graphics.getHeight()*0.7
+
 function love.load()
 	if assets == nil then
 		assets = require("assets")
@@ -17,7 +19,7 @@ function love.load()
 	local xinc = love.graphics.getWidth() / number_of_wave_points * 2
 	for i=1,number_of_wave_points do
 		local xx = (i-1)*xinc
-		local yy = love.graphics.getHeight()*0.5
+		local yy = REST_Y
 
 		wave_points[i] = {
 			x = xx,
@@ -30,11 +32,10 @@ end
 
 function love.update(dt)
 	local sp = dt * 90
-	local rest = love.graphics.getHeight()*0.5
 
 	for i,pt in ipairs(wave_points) do
 		pt.x = pt.x - sp
-		pt.y = rest + pt.dist + math.sin(pt.x * 0.02) * 10
+		pt.y = REST_Y + pt.dist + math.sin(pt.x * 0.02) * 10
 	end
 end
 
