@@ -68,18 +68,21 @@ function love.load()
 	lost = false
 	msg.hide()
 	fade_in = 255
+
+	show_instructions = true
+	instructions_fade = 255
 end
 
 function love.update(dt)
 	-- The seas only get rougher if we haven't lost yet
-	if not lost then
+	if not lost and not show_instructions then
 		total_time = total_time + dt
 	end
 
 	local sp = dt * 90
 	wave_offset = wave_offset - sp
 	for i,pt in ipairs(wave_points) do
-		pt.y = REST_Y + pt.dist + math.sin((pt.x + wave_offset) * 0.02) * (10 + total_time)
+		pt.y = REST_Y + pt.dist + math.sin((pt.x + wave_offset) * 0.02) * total_time
 	end
 
 	if wave_offset < -wave_points[1].x - DIST_BETWEEN_WATER_POINTS then
@@ -99,8 +102,10 @@ function love.update(dt)
 		if love.keyboard.isDown(KEY_LEFT) then input = input - 1 end
 
 		if input == 1 then
+			show_instructions = false
 			boat_right.ay = boat_right.ay + INPUT_YSTRENGTH
 		elseif input == -1 then
+			show_instructions = false
 			boat_left.ax = boat_left.ax - INPUT_XSTRENGTH
 			boat_left.ay = boat_left.ay + INPUT_YSTRENGTH
 		end
@@ -127,8 +132,11 @@ function love.update(dt)
 			else
 				local f = math.max(-physics.gravity*1.5, water_level-p.y)
 				p.oldx = p.x
-				p.ax = p.ax - WATER_SPEED
 				p.y = p.y - (p.y - water_level)*0.01
+
+				if not show_instructions then
+					p.ax = p.ax - WATER_SPEED
+				end
 			end
 		elseif p.underwater then
 			p.y = p.y + (water_level - p.y) * .1
@@ -206,6 +214,14 @@ function love.draw()
 	if fade_in > 0 then
 		love.graphics.setColor(0, 0, 0, fade_in)
 		love.graphics.rectangle("fill",0,0,love.graphics.getWidth(),love.graphics.getHeight())
+	end
+
+	if not show_instructions then
+		instructions_fade = instructions_fade - 2
+	end
+	if instructions_fade > 0 and not lost then
+		love.graphics.setColor(255,255,255, instructions_fade)
+		love.graphics.print("Left/Right arrows to begin...",16,love.graphics.getHeight()-32)
 	end
 end
 
