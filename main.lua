@@ -30,7 +30,7 @@ INPUT_XSTRENGTH = 50
 INPUT_YSTRENGTH = 100
 
 BAL_REMEMBER = 1
-BAL_STORM_AT_SEA = .1
+BAL_STORM_AT_SEA = 0
 
 CLOUD_CENTER_X = 156
 CLOUD_CENTER_Y = 111
@@ -223,6 +223,9 @@ function love.draw()
 		love.graphics.setColor(255,255,255, instructions_fade)
 		love.graphics.print("Left/Right arrows to begin...",16,love.graphics.getHeight()-32)
 	end
+
+	love.graphics.setColor(255,255,255)
+	love.graphics.printf(string.format("%.1f", total_time).." mi.",0,love.graphics.getHeight()-32,love.graphics.getWidth()-16,"right")
 end
 
 function love.keypressed(key)
