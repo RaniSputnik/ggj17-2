@@ -22,6 +22,7 @@ function love.load()
 		assets = require("assets")
 	end
 
+	total_time = 0
 	wave_offset = 0
 	wave_points = {}
 	for i=1,NUMBER_OF_WAVE_POINTS do
@@ -38,6 +39,7 @@ function love.load()
 
 	physics.newWorld()
 
+	--    p7
 	-- p1-p2-p5
 	-- p4-p3-p6
 	local p1 = physics.newPoint(130,540)
@@ -46,6 +48,8 @@ function love.load()
 	local p4 = physics.newPoint(130,545)
 	local p5 = physics.newPoint(170,540)
 	local p6 = physics.newPoint(170,545)
+	local p7 = physics.newPoint(150,500)
+	p7.float = false
 
 	boat_center = p3
 	boat_left = p1
@@ -65,13 +69,19 @@ function love.load()
 
 	physics.newConstraint(p2,p6)
 	physics.newConstraint(p3,p5)
+
+	physics.newConstraint(p2,p7)
+	physics.newConstraint(p1,p7)
+	physics.newConstraint(p5,p7)
 end
 
 function love.update(dt)
+	total_time = total_time + dt
+
 	local sp = dt * 90
 	wave_offset = wave_offset - sp
 	for i,pt in ipairs(wave_points) do
-		pt.y = REST_Y + pt.dist + math.sin((pt.x + wave_offset) * 0.02) * 10
+		pt.y = REST_Y + pt.dist + math.sin((pt.x + wave_offset) * 0.02) * (10 + total_time)
 	end
 
 	if wave_offset < -wave_points[1].x - DIST_BETWEEN_WATER_POINTS then
@@ -80,14 +90,14 @@ function love.update(dt)
 		local lastpt = wave_points[n]
 		pt.i = lastpt.i + 1
 		pt.x = (pt.i-1) * DIST_BETWEEN_WATER_POINTS
-		pt.dist = math.sin(pt.x * 0.01) * 100
+		pt.dist = math.sin(pt.x * 0.01) * (100 + total_time)
 		table.insert(wave_points, pt)
 	end
 
 	-- Physics the boat
 	for i,p in ipairs(physics.points) do
 		local water_level = waterHeightAtX(p.x)
-		if p.y > water_level then
+		if p.float and p.y > water_level then
 			local f = math.max(-physics.gravity*1.5, water_level-p.y)
 			p.oldx = p.x
 			p.y = p.y - (p.y - water_level)*0.01

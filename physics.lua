@@ -20,7 +20,8 @@ physics.newPoint = function(x,y)
 		oldx = x, 
 		oldy = y,
 		ax = 0, 
-		ay = 0
+		ay = 0,
+		float = true
 	}
 	table.insert(physics.points, p)
 	return p
@@ -54,9 +55,6 @@ physics.run = function(timestep)
 		p.oldy = tempy
 		p.ax = 0
 		p.ay = 0
-
-		if p.x < 0 then p.x = 0 elseif p.x > world_width then p.x = world_width p.oldy = p.y end
-		if p.y < 0 then p.y = 0 elseif p.y > world_height then p.y = world_height p.oldx = p.x end
 	end
 
 	for i,c in ipairs(physics.constraints) do
