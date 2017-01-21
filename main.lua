@@ -4,6 +4,7 @@ physics = require("physics")
 DEBUG_DRAW_WATER_POLY = true
 DEBUG_DRAW_NO_BG = true
 DEBUG_DRAW_PHYSICS = true
+DEBUG_DRAW_WATER_HEIGHT = true
 
 KEY_RESTART = "r"
 KEY_QUIT = "escape"
@@ -96,6 +97,13 @@ function love.draw()
 		love.graphics.setColor(0,255,0)
 		physics.debugDraw()
 	end
+
+	if DEBUG_DRAW_WATER_HEIGHT then
+		local mx = love.mouse.getX()
+		local hy = waterHeightAtX(mx)
+		love.graphics.setColor(0, 255, 255)
+		love.graphics.circle("fill", mx, hy, 2, 5)
+	end
 end
 
 function love.keypressed(key)
@@ -103,5 +111,20 @@ function love.keypressed(key)
 		love.load()
 	elseif key == KEY_QUIT then
 		love.quit()
+	end
+end
+
+function waterHeightAtX(x)
+	for i,pt in ipairs(wave_points) do
+		if pt.x+wave_offset > x and i > 1 then
+			pt2 = pt
+			pt = wave_points[i - 1]
+
+			local dx = pt2.x - pt.x
+			local dy = pt2.y - pt.y
+			local dist = math.sqrt(dx*dx + dy*dy)
+			local a = (x - (pt.x + wave_offset))/dx
+			return pt.y + dy * a
+		end
 	end
 end
