@@ -185,7 +185,7 @@ function love.keypressed(key)
 	if key == KEY_RESTART then
 		love.load()
 	elseif key == KEY_QUIT then
-		love.quit()
+		love.event.quit()
 	end
 end
 
