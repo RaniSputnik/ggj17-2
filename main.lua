@@ -22,6 +22,9 @@ DEPTH_TO_LOSE = 30
 ANGLE_TO_LOSE = math.rad(90)
 INPUT_STRENGTH = 100
 
+BAL_REMEMBER = 1
+BAL_STORM_AT_SEA = .1
+
 function love.load()
 	if assets == nil then
 		assets = require("assets")
@@ -85,7 +88,9 @@ function love.load()
 		love.audio.stop(assets.music.remember)
 	end
 	love.audio.play(assets.music.remember)
-	assets.music.remember:setVolume(1)
+	love.audio.play(assets.music.stormatsea)
+	assets.music.remember:setVolume(BAL_REMEMBER)
+	assets.music.stormatsea:setVolume(BAL_STORM_AT_SEA)
 
 	lost = false
 end
@@ -148,9 +153,9 @@ function love.update(dt)
 
 	-- fade the music
 	if lost then
-		local v = assets.music.remember:getVolume() * 0.95
+		local v = assets.music.remember:getVolume() * 0.98
 		if v < 0.005 then v = 0 end
-		assets.music.remember:setVolume(v)
+		assets.music.remember:setVolume(BAL_REMEMBER * v)
 	end
 end
 
