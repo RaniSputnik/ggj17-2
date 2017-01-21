@@ -3,7 +3,8 @@ return {
 		bg_storm = love.graphics.newImage("assets/bg-storm.png"),
 		boat = love.graphics.newImage("assets/boat.png"),
 		sailboat = love.graphics.newImage("assets/sailboat.png"),
-		sailboat_sunk = love.graphics.newImage("assets/sailboat-sunk.png")
+		sailboat_sunk = love.graphics.newImage("assets/sailboat-sunk.png"),
+		cloud1 = love.graphics.newImage("assets/cloud-1.png")
 	},
 	fx = {},
 	music = {

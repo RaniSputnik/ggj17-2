@@ -1,11 +1,13 @@
 color = require("color")
 physics = require("physics")
 geom = require("geom")
+clouds = require("clouds")
 
 DEBUG_DRAW_WATER_POLY = false
 DEBUG_DRAW_NO_BG = false
 DEBUG_DRAW_PHYSICS = false
 DEBUG_DRAW_WATER_HEIGHT = false
+DEBUG_DRAW_CLOUDS = false
 
 KEY_RESTART = "r"
 KEY_QUIT = "escape"
@@ -27,6 +29,9 @@ INPUT_YSTRENGTH = 100
 
 BAL_REMEMBER = 1
 BAL_STORM_AT_SEA = .1
+
+CLOUD_CENTER_X = 156
+CLOUD_CENTER_Y = 111
 
 function love.load()
 	if assets == nil then
@@ -168,6 +173,8 @@ function love.update(dt)
 		if v < 0.005 then v = 0 end
 		assets.music.remember:setVolume(BAL_REMEMBER * v)
 	end
+
+	clouds.run(dt)
 end
 
 function love.draw()
@@ -178,6 +185,7 @@ function love.draw()
 		love.graphics.setColor(color.val(COL_WHITE))
 		love.graphics.draw(img, 0,0, 0, sx,sy)
 	end
+	clouds.draw(CLOUD_CENTER_X,CLOUD_CENTER_Y, sx,sy, DEBUG_DRAW_CLOUDS)
 
 	local vertices = {}
 	local n = table.getn(wave_points)

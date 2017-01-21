@@ -8,4 +8,12 @@ geom.angleBetween = function(x1,y1,x2,y2)
 	return theta
 end
 
+geom.lengthDirX = function(len,dir)
+	return len * math.sin(dir)
+end
+
+geom.lengthDirY = function(len,dir)
+	return len * math.cos(dir)
+end
+
 return geom
