@@ -7,9 +7,9 @@ end
 local physics = {}
 
 physics.newWorld = function()
-	points = {}
-	constraints = {}
-	gravity = 50
+	physics.points = {}
+	physics.constraints = {}
+	physics.gravity = 20
 end
 
 physics.newPoint = function(x,y)
@@ -22,7 +22,7 @@ physics.newPoint = function(x,y)
 		ax = 0, 
 		ay = 0
 	}
-	table.insert(points, p)
+	table.insert(physics.points, p)
 	return p
 end
 
@@ -34,18 +34,18 @@ physics.newConstraint = function(p1,p2)
 		p2 = p2,
 		restlength = dist
 	}
-	table.insert(constraints, c)
+	table.insert(physics.constraints, c)
 	return c
 end
 
 physics.run = function(timestep)
-	sqrtimestep = timestep * timestep
+	sqrtimestep = timestep * timestep * 10
 
 	local world_width = love.graphics.getWidth()
 	local world_height = love.graphics.getHeight()
 	
-	for i,p in ipairs(points) do
-		p.ay = p.ay + gravity
+	for i,p in ipairs(physics.points) do
+		p.ay = p.ay + physics.gravity
 
 		local tempx, tempy = p.x, p.y
 		p.x = p.x + (p.x - p.oldx) + p.ax * sqrtimestep
@@ -59,7 +59,7 @@ physics.run = function(timestep)
 		if p.y < 0 then p.y = 0 elseif p.y > world_height then p.y = world_height p.oldx = p.x end
 	end
 
-	for i,c in ipairs(constraints) do
+	for i,c in ipairs(physics.constraints) do
 		local deltax = c.p2.x - c.p1.x
 		local deltay = c.p2.y - c.p1.y
 		local len = math.sqrt(deltax*deltax + deltay*deltay)
@@ -72,11 +72,11 @@ physics.run = function(timestep)
 end
 
 physics.debugDraw = function()
-	for i,c in ipairs(constraints) do
+	for i,c in ipairs(physics.constraints) do
 		love.graphics.line(c.p1.x,c.p1.y, c.p2.x,c.p2.y)
 	end
 
-	for i,p in ipairs(points) do
+	for i,p in ipairs(physics.points) do
 		love.graphics.circle("fill", p.x, p.y, 5, 12)
 	end
 end

@@ -4,7 +4,7 @@ physics = require("physics")
 DEBUG_DRAW_WATER_POLY = true
 DEBUG_DRAW_NO_BG = true
 DEBUG_DRAW_PHYSICS = true
-DEBUG_DRAW_WATER_HEIGHT = true
+DEBUG_DRAW_WATER_HEIGHT = false
 
 KEY_RESTART = "r"
 KEY_QUIT = "escape"
@@ -37,10 +37,17 @@ function love.load()
 
 	physics.newWorld()
 
-	local p1 = physics.newPoint(100,100)
-	local p2 = physics.newPoint(160,80)
-	local p3 = physics.newPoint(180,180)
-	local p4 = physics.newPoint(100,150)
+	-- p7-p1-p2-p5-p8
+	--    p4-p3-p6
+	local p1 = physics.newPoint(100,500)
+	local p2 = physics.newPoint(150,500)
+	local p3 = physics.newPoint(150,550)
+	local p4 = physics.newPoint(100,520)
+	local p5 = physics.newPoint(200,500)
+	local p6 = physics.newPoint(200,520)
+
+	local p7 = physics.newPoint(50,500)
+	local p8 = physics.newPoint(250,500)
 
 	physics.newConstraint(p1,p2)
 	physics.newConstraint(p2,p3)
@@ -49,6 +56,18 @@ function love.load()
 
 	physics.newConstraint(p1,p3)
 	physics.newConstraint(p2,p4)
+
+	physics.newConstraint(p2,p5)
+	physics.newConstraint(p5,p6)
+	physics.newConstraint(p6,p3)
+
+	physics.newConstraint(p2,p6)
+	physics.newConstraint(p3,p5)
+
+	physics.newConstraint(p7,p1)
+	physics.newConstraint(p7,p4)
+	physics.newConstraint(p8,p5)
+	physics.newConstraint(p8,p6)
 end
 
 function love.update(dt)
@@ -68,6 +87,16 @@ function love.update(dt)
 		table.insert(wave_points, pt)
 	end
 
+	-- Physics the boat
+	for i,p in ipairs(physics.points) do
+		local water_level = waterHeightAtX(p.x)
+		if p.y > water_level then
+			local f = math.max(-physics.gravity*1.5, water_level-p.y)
+			p.oldx = p.x
+			p.y = p.y - (p.y - water_level)*0.01
+		end
+	end
+	-- Run the verlet and constraints
 	physics.run(dt)
 end
 
