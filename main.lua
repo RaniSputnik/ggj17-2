@@ -81,6 +81,12 @@ function love.load()
 	physics.newConstraint(p1,p7)
 	physics.newConstraint(p5,p7)
 
+	if lost then
+		love.audio.stop(assets.music.remember)
+	end
+	love.audio.play(assets.music.remember)
+	assets.music.remember:setVolume(1)
+
 	lost = false
 end
 
@@ -138,6 +144,14 @@ function love.update(dt)
 	end
 	-- Run the verlet and constraints
 	physics.run(dt)
+
+
+	-- fade the music
+	if lost then
+		local v = assets.music.remember:getVolume() * 0.95
+		if v < 0.005 then v = 0 end
+		assets.music.remember:setVolume(v)
+	end
 end
 
 function love.draw()
