@@ -4,7 +4,7 @@ geom = require("geom")
 
 DEBUG_DRAW_WATER_POLY = false
 DEBUG_DRAW_NO_BG = false
-DEBUG_DRAW_PHYSICS = true
+DEBUG_DRAW_PHYSICS = false
 DEBUG_DRAW_WATER_HEIGHT = false
 
 KEY_RESTART = "r"
@@ -38,17 +38,14 @@ function love.load()
 
 	physics.newWorld()
 
-	-- p7-p1-p2-p5-p8
-	--    p4-p3-p6
+	-- p1-p2-p5
+	-- p4-p3-p6
 	local p1 = physics.newPoint(130,540)
 	local p2 = physics.newPoint(150,540)
 	local p3 = physics.newPoint(150,550)
 	local p4 = physics.newPoint(130,545)
 	local p5 = physics.newPoint(170,540)
 	local p6 = physics.newPoint(170,545)
-
-	local p7 = physics.newPoint(100,500)
-	local p8 = physics.newPoint(200,500)
 
 	boat_center = p3
 	boat_left = p1
@@ -68,13 +65,6 @@ function love.load()
 
 	physics.newConstraint(p2,p6)
 	physics.newConstraint(p3,p5)
-
-	physics.newConstraint(p7,p1)
-	physics.newConstraint(p7,p4)
-	physics.newConstraint(p8,p5)
-	physics.newConstraint(p8,p6)
-
-	physics.newConstraint(p7,p8)
 end
 
 function love.update(dt)
@@ -136,7 +126,7 @@ function love.draw()
 	end
 	local r = geom.angleBetween(boat_left.x,boat_left.y, boat_right.x,boat_right.y)
 	local ox = assets.img.boat:getWidth() * 0.5
-	local oy = assets.img.boat:getHeight() * 0.5
+	local oy = assets.img.boat:getHeight() * 0.7
 	love.graphics.setColor(color.val(COL_WHITE))
 	love.graphics.draw(assets.img.boat, boat_center.x,boat_center.y, r, sx,sy, ox,oy)
 
