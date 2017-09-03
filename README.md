@@ -1,13 +1,16 @@
 # GGJ 2017
 
-My second attempt at a game for Global Game Jam 2017, theme is `Waves`. Made with [love2d](http://love2d.org) (you will need to install love to play).
+My second attempt at a game for Global Game Jam 2017, theme is `Waves`, made with [love](http://love2d.org).
 
 ### Run
 
-With love installed, you can run the following (OSX);
+You can get the final distribution from the Global Game Jam site, [globalgamejam.org/2017/games/waves-13](http://globalgamejam.org/2017/games/waves-13)
+
+Alternatively, with love installed, you can run the following (OSX);
 
 ```
-cd /path/to/ggj2017-2
+git clone https://github.com/RaniSputnik/ggj17-2
+cd ggj2017-2
 /Applications/love.app/Contents/MacOS/love .
 ```
 
